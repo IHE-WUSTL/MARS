@@ -1,0 +1,543 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+    Document   : Request
+    Created on : Feb 28, 2011, 9:02:45 AM
+    Author     : rmoult01
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+   <h:body>  
+
+      <ui:composition template="./layout/lambdaTemplate.xhtml">
+
+         <ui:define name="content"> 
+
+            <!-- Table of studies user can work on for selection -->
+
+            <ice:panelGroup 
+               rendered="#{requestBean.state.renderStudyTable()}">
+               <ice:outputText rendered="#{requestBean.studyUsersEmpty()}"
+                               value="You are not assigned to any studies"/>
+               <ice:panelGrid columns="2"
+                              rendered="#{!requestBean.studyUsersEmpty()}">
+
+                  <ice:dataTable id="studytable"
+                                 var="studyuser"
+                                 value="#{requestBean.studyUsers}"
+                                 scrollable="true"
+                                 scrollHeight="310px"
+                                 columnWidths="100px, 400px, 100px, 100px"
+                                 sortColumn="#{requestBean.sortColumnName}"
+                                 sortAscending="#{requestBean.ascending}">
+                     <f:facet name="header">
+                        <ice:outputText value="Your assigned Studies" style="text-align: center"/>
+                     </f:facet>
+
+                     <ice:column style="width: 100px">
+
+                        <ice:rowSelector id="selected"
+                                         value="#{studyuser.selected}"
+                                         selectionAction="#{requestBean.studyUserSelected}"
+                                         preStyleOnSelection="true"/>
+
+                        <f:facet name="header">
+                           <ice:commandSortHeader columnName="id">
+                              <ice:outputText value="Study Id"/>
+                           </ice:commandSortHeader>
+                        </f:facet>
+                        <ice:outputText value="#{studyuser.study.id}"/>
+                     </ice:column>
+
+                     <ice:column style="width: 400px">
+                        <f:facet name="header">
+                           <ice:outputText value="Study Description"/>
+                        </f:facet>
+                        <ice:outputText value="#{studyuser.study.description}"/>
+                     </ice:column>
+
+                     <ice:column style="width: 100px">
+                        <f:facet name="header">
+                           <ice:outputText value="Role"/>
+                        </f:facet>
+                        <ice:outputText value="#{studyuser.userRoleName}"/>
+                     </ice:column>
+
+                     <ice:column style="width: 100px">
+                        <f:facet name="header">
+                           <ice:outputText value="Receive Alerts"/>
+                        </f:facet>
+                        <ice:outputText value="#{studyuser.receiveAlerts}"/>
+                     </ice:column>
+
+                  </ice:dataTable>
+
+                  <ice:outputText value="Choose a study to work with"/>
+
+               </ice:panelGrid>
+            </ice:panelGroup> <!-- EO table of studies user can work on -->
+
+            <!-- Tabs for ADD/CHG of Alert Requests, With Study info at top -->
+
+            <ice:panelGroup rendered="#{requestBean.state.renderTabs()}">
+
+               <ice:panelGrid columns="2">
+                  <ice:outputText value="#{requestBean.study.study.id}"/>
+                  <ice:outputText value="#{requestBean.study.study.description}"/>
+               </ice:panelGrid>
+
+               <ice:panelTabSet selectedIndex="#{requestBean.selectedTab}"
+                                tabChangeListener="#{requestBean.tabChangeListener}">
+
+                  <!-- Add Requests -->
+
+                  <ice:panelTab label="Add New Requests">
+
+                     <ice:panelGrid columns="2">
+
+                        <!-- New Request data entry -->
+
+                        <ice:panelGroup>
+
+                           <ice:panelGrid columns ="2">
+
+                              <ice:outputLabel value="MPI #" for="aMpi"/>
+                              <ice:inputText id="aMpi" size="10" maxlength="10"
+                                             value="#{requestBean.newRequest.mpi}"/>
+
+                              <ice:outputLabel value="First Name" for="afn"/>
+                              <ice:inputText id="afn"
+                                             value="#{requestBean.newRequest.firstName}"/>
+
+                              <ice:outputLabel value="Last Name" for="aln"/>
+                              <ice:inputText id="aln"
+                                             value="#{requestBean.newRequest.lastName}"/>
+
+                              <ice:outputLabel value="DOB 'mm/dd/yyyy'" for="adob"/>
+                              <ice:inputText id="adob"
+                                             value="#{requestBean.newRequest.dispDob}">
+                           <f:convertDateTime pattern="MM/dd/yyyy"
+                                              timeZone="#{applicationBean.timeZone}"/>
+                              </ice:inputText>
+
+                              <ice:outputLabel value="Gender" for="gnd"/>
+                              <ice:selectOneMenu value="#{requestBean.newRequest.sex}">
+                                 <f:selectItems value="#{requestBean.sexes}"/>
+                              </ice:selectOneMenu>
+
+                              <ice:outputLabel value="Schedule alerts?" for="gsa"/>
+                              <ice:selectBooleanCheckbox 
+                                 value="#{requestBean.newRequest.scheduleAlerts}"/>
+
+                              <ice:outputLabel value="Report alerts?" for="gra"/>
+                              <ice:selectBooleanCheckbox 
+                                 value="#{requestBean.newRequest.finalReportAlerts}"/>
+
+                           </ice:panelGrid>
+                           <ice:panelGrid columns="4">
+                              <ice:commandButton
+                                 value="OK"
+                                 actionListener="#{requestBean.addNewRequest}"/>
+                              <ice:commandButton
+                                 value="Cancel"
+                                 actionListener="#{requestBean.cancelNewRequest}"/>
+                              <ice:commandButton
+                                 value="Done with this study"
+                                 actionListener="#{requestBean.doneWithStudy}"/>
+                              <ice:commandButton
+                                 value="Look for RIS match"
+                                 visible="false"
+                                 disabled="#{requestBean.disableAddMatch()}"
+                                 actionListener="#{requestBean.startRISMatch}">
+                                 <f:attribute name="request" value="#{requestBean.newRequest}"/>
+                              </ice:commandButton>
+                           </ice:panelGrid>
+                        </ice:panelGroup>
+
+                        <!-- Listing of similar requests found during add -->
+
+                        <ice:panelGroup rendered="#{requestBean.similarRequestsCount() > 0}">
+
+                           <ice:dataTable id="simTable"
+                                       var="sim"
+                                       value="#{requestBean.similarRequests}"
+                                       scrollable="true"
+                                       scrollHeight="200px"
+                                       columnWidths="100px, 200px, 75px, 40px, 50px, 50px">
+
+                           <f:facet name="header">
+                              <ice:outputText value="Similar requests found"
+                                              style="text-align: center"/>
+                           </f:facet>
+
+                           <ice:column style="width: 100px">
+                              <f:facet name="header">
+                                    <ice:outputText value="MPI #"/>
+                              </f:facet>
+                              <ice:outputText value="#{sim.mpi}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 200px">
+                              <f:facet name="header">
+                                    <ice:outputText value="Name"/>
+                              </f:facet>
+                              <ice:outputText value="#{sim.lastName}, #{sim.firstName}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 75px">
+                              <f:facet name="header">
+                                    <ice:outputText value="DOB"/>
+                              </f:facet>
+                              <ice:outputText value="#{sim.dispDob}">
+                                 <f:convertDateTime pattern="MM/dd/yyyy"/>
+                              </ice:outputText>
+                           </ice:column>
+
+                           <ice:column style="width: 40px">
+                              <f:facet name="header">
+                                    <ice:outputText value="Sex"/>
+                              </f:facet>
+                              <ice:outputText value="#{sim.sex}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 50px">
+                              <f:facet name="header">
+                                    <ice:outputText value="Schedule Alerts"/>
+                              </f:facet>
+                              <ice:outputText value="#{sim.scheduleAlerts}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 50px">
+                              <f:facet name="header">
+                                    <ice:outputText value="Report Alerts"/>
+                              </f:facet>
+                              <ice:outputText value="#{sim.finalReportAlerts}"/>
+                           </ice:column>
+
+                        </ice:dataTable>
+
+                              <ice:commandButton
+                                 value="Add anyway"
+                                 actionListener="#{requestBean.addAnyway}"/>
+
+                        </ice:panelGroup>
+
+                     </ice:panelGrid>
+                  </ice:panelTab>  <!-- EO Add Requests Tab -->
+
+                  <!-- Chg Requests Tab -->
+
+                  <ice:panelTab label="Modify or Delete Requests">
+
+                     <!-- Table of existing requests for user selection -->
+
+                     <ice:panelGrid columns="2" rendered="#{requestBean.state.renderChgTable()}">
+
+                        <ice:outputText
+                           rendered="#{requestBean.requestsEmpty}"
+                           value="No requests on file for this study"/>
+
+                        <ice:dataTable id="requestTable"
+                                       rendered="#{!requestBean.requestsEmpty}"
+                                       var="req"
+                                       value="#{requestBean.requests}"
+                                       scrollable="true"
+                                       scrollHeight="310px"
+                                       columnWidths="100px, 200px, 75px, 40px, 50px, 50px"
+                                       sortColumn="#{requestBean.sortCol}"
+                                       sortAscending="#{requestBean.ascend}">
+
+                           <f:facet name="header">
+                              <ice:outputText value="Current Requests for this study"
+                                              style="text-align: center"/>
+                           </f:facet>
+
+                           <ice:column style="width: 100px">
+
+                              <ice:rowSelector 
+                                 value="#{req.selected}"
+                                 selectionAction="#{requestBean.requestSelected}"
+                                 preStyleOnSelection="true"/>
+
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="mpi">
+                                    <ice:outputText value="MPI #"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.mpi}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 200px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="name">
+                                    <ice:outputText value="Name"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.lastName}, #{req.firstName}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 75px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="dob">
+                                    <ice:outputText value="DOB"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.dispDob}">
+                                 <f:convertDateTime pattern="MM/dd/yyyy"/>
+                              </ice:outputText>
+                           </ice:column>
+
+                           <ice:column style="width: 40px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="sex">
+                                    <ice:outputText value="Sex"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.sex}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 50px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="scheduleAlerts">
+                                    <ice:outputText value="Schedule Alerts"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.scheduleAlerts}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 50px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="reportAlerts">
+                                    <ice:outputText value="Report Alerts"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.finalReportAlerts}"/>
+                           </ice:column>
+
+                        </ice:dataTable>
+
+                        <!-- Instructional lead through message -->
+
+                        <ice:outputText
+                           rendered="#{requestBean.state.renderChgTypeButtons()}"
+                           value="Choose action for selected request"/>
+                        <ice:outputText
+                           rendered="#{!requestBean.state.renderChgTypeButtons() and !requestBean.requestsEmpty}"
+                           value="Select Request to Modify/Delete"/>
+                        <ice:outputText
+                           rendered="#{requestBean.requestsEmpty}"
+                           value=" "/>
+
+                        <!-- Action to take buttons-->
+
+                        <ice:panelGrid columns="3">
+                           <ice:commandButton
+                              rendered="#{requestBean.state.renderChgTypeButtons()}"
+                              value="Modify Request"
+                              actionListener="#{requestBean.chgTypeModifyRequest}"/>
+                           <ice:commandButton
+                              rendered="#{requestBean.state.renderChgTypeButtons()}"
+                              value="Delete Request"
+                              actionListener="#{requestBean.chgTypeDeleteRequest}"/>
+                           <ice:commandButton
+                              value="Done with this study"
+                              actionListener="#{requestBean.doneWithStudy}"/>
+                        </ice:panelGrid>
+
+                     </ice:panelGrid> <!-- EO change request -->
+
+                     <!-- Modify selected user -->
+
+                     <ice:panelGrid
+                        columns="2"
+                        rendered="#{requestBean.state.renderModify()}">
+
+                        <ice:outputLabel value="MPI #" for="cMpi"/>
+                        <ice:inputText id="cMpi" size="10" maxlength="10"
+                                       value="#{requestBean.chgRequest.mpi}"/>
+
+                        <ice:outputLabel value="First Name" for="cfn"/>
+                        <ice:inputText id="cfn"
+                                       value="#{requestBean.chgRequest.firstName}"/>
+
+                        <ice:outputLabel value="Last Name" for="cln"/>
+                        <ice:inputText id="cln"
+                                       value="#{requestBean.chgRequest.lastName}"/>
+
+                        <ice:outputLabel value="DOB 'mm/dd/yyyy'" for="cdob"/>
+                        <ice:inputText id="cdob"
+                                       value="#{requestBean.chgRequest.dispDob}">
+                           <f:convertDateTime pattern="MM/dd/yyyy"
+                                              timeZone="#{applicationBean.timeZone}"/>
+                        </ice:inputText>
+
+                        <ice:outputLabel value="Gender" for="cgnd"/>
+                        <ice:selectOneMenu id="cgnd" value="#{requestBean.chgRequest.sex}">
+                           <f:selectItems value="#{requestBean.sexes}"/>
+                        </ice:selectOneMenu>
+
+                        <ice:outputLabel value="Schedule alerts?" for="cgsa"/>
+                        <ice:selectBooleanCheckbox id="cgsa"
+                                                   value="#{requestBean.chgRequest.scheduleAlerts}"/>
+
+                        <ice:outputLabel value="Report alerts?" for="cgra"/>
+                        <ice:selectBooleanCheckbox id ="cgra"
+                                                   value="#{requestBean.chgRequest.finalReportAlerts}"/>
+
+                        <ice:commandButton value="Update Request"
+                                           actionListener="#{requestBean.modRequestUpdate}"/>
+                        <ice:commandButton value="Cancel"
+                                           actionListener="#{requestBean.modRequestCancel}"/>
+                        <ice:commandButton
+                           value="Look for RIS match"
+                           visible="false"
+                           disabled="#{requestBean.disableChgMatch()}"
+                           actionListener="#{requestBean.startRISMatch}">
+                           <f:attribute name="request" value="#{requestBean.chgRequest}"/>
+                        </ice:commandButton>
+                     </ice:panelGrid>
+
+                     <!-- Delete selected user -->
+
+                     <ice:panelGrid
+                        columns="2"
+                        rendered="#{requestBean.state.renderDelete()}">
+
+                        <ice:outputText value="MPI #"/>
+                        <ice:outputText value="#{requestBean.chgRequest.mpi}"/>
+
+                        <ice:outputText value="First Name"/>
+                        <ice:outputText value="#{requestBean.chgRequest.firstName}"/>
+
+                        <ice:outputText value="Last Name"/>
+                        <ice:outputText value="#{requestBean.chgRequest.lastName}"/>
+
+                        <ice:outputText value="DOB"/>
+                        <ice:outputText value="#{requestBean.chgRequest.dispDob}">
+                           <f:convertDateTime pattern="MM/dd/yyyy"/>
+                        </ice:outputText>
+
+                        <ice:outputText value="Gender"/>
+                        <ice:outputText value="#{requestBean.chgRequest.sex}"/>
+
+                        <ice:outputText value="Schedule alerts?"/>
+                        <ice:outputText value="#{requestBean.chgRequest.scheduleAlerts}"/>
+
+                        <ice:outputText value="Report alerts?"/>
+                        <ice:outputText value="#{requestBean.chgRequest.finalReportAlerts}"/>
+
+                        <ice:commandButton value="Delete Request"
+                                           actionListener="#{requestBean.delRequest}"/>
+                        <ice:commandButton value="Cancel"
+                                           actionListener="#{requestBean.delRequestCancel}"/>
+                     </ice:panelGrid>
+
+                  </ice:panelTab>
+
+
+               </ice:panelTabSet>
+
+
+            </ice:panelGroup>  <!-- EO Tabs -->
+
+            <!-- View only -->
+
+            <ice:panelGrid id="viewOnly" columns="1"
+                           rendered="#{requestBean.state.renderView()}">
+
+
+                        <ice:outputText
+                           rendered="#{requestBean.requestsEmpty}"
+                           value="No requests on file for this study"/>
+
+                        <ice:dataTable id="requestTable"
+                                       rendered="#{!requestBean.requestsEmpty}"
+                                       var="req"
+                                       value="#{requestBean.requests}"
+                                       scrollable="true"
+                                       scrollHeight="310px"
+                                       columnWidths="100px, 200px, 75px, 40px, 50px, 50px"
+                                       sortColumn="#{requestBean.sortCol}"
+                                       sortAscending="#{requestBean.ascend}">
+
+                           <f:facet name="header">
+                              <ice:outputText value="Current Requests for this study"
+                                              style="text-align: center"/>
+                           </f:facet>
+
+                           <ice:column style="width: 100px">
+
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="mpi">
+                                    <ice:outputText value="MPI #"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.mpi}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 200px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="name">
+                                    <ice:outputText value="Name"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.lastName}, #{req.firstName}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 75px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="dob">
+                                    <ice:outputText value="DOB"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.dispDob}">
+                                 <f:convertDateTime pattern="MM/dd/yyyy"/>
+                              </ice:outputText>
+                           </ice:column>
+
+                           <ice:column style="width: 40px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="sex">
+                                    <ice:outputText value="Sex"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.sex}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 50px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="scheduleAlerts">
+                                    <ice:outputText value="Schedule Alerts"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.scheduleAlerts}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 50px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="reportAlerts">
+                                    <ice:outputText value="Report Alerts"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{req.finalReportAlerts}"/>
+                           </ice:column>
+
+                        </ice:dataTable>
+
+                           <ice:commandButton
+                              value="Done with this study"
+                              actionListener="#{requestBean.doneWithStudy}"/>
+
+            </ice:panelGrid>
+
+
+
+         </ui:define>    <!-- EO content -->
+      </ui:composition>  <!-- EO lambdaTemplate -->
+   </h:body>
+</html>

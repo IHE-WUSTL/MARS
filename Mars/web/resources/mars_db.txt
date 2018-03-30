@@ -1,0 +1,461 @@
+mars=# \dt
+               List of relations
+ Schema |        Name        | Type  |  Owner   
+--------+--------------------+-------+----------
+ public | archived_messages  | table | postgres
+ public | hl7_file_index     | table | postgres
+ public | hl7_match_warnings | table | postgres
+ public | matching_hl7_index | table | postgres
+ public | msg_log            | table | postgres
+ public | notification       | table | postgres
+ public | roles              | table | postgres
+ public | user_roles         | table | postgres
+ public | users              | table | postgres
+
+mars=# \d users
+                Table "public.users"
+    Column     |          Type          | Modifiers 
+---------------+------------------------+-----------
+ user_name     | character varying(20)  | not null
+ user_password | text                   | not null
+ emailaddr     | character varying(100) | not null
+ userfname     | character varying(50)  | not null
+ userlname     | character varying(50)  | not null
+ office_phone  | character varying(15)  | 
+ cell_phone    | character varying(15)  | 
+Indexes:
+    "users_pkey" primary key, btree (user_name)
+
+mars=# select * from users;
+ user_name  |          user_password           |          emailaddr          | userfname |  userlname   | office_phone | cell_phone 
+------------+----------------------------------+-----------------------------+-----------+--------------+--------------+------------
+ aldeap     | B9341C5C4B536D4EF16060313EBFA1FD | aldeap@msnotes.wustl.edu    | Trish     | Aldea        | N/A          | N/A
+ Wadej      | FC738BDBF829BAA00EDB5F12DB27A7A5 | wadej@mir.wustl.edu         | Jeanine   | Wade         | 362-2940     | N/A
+ kaemmererh | 2C68A68BA73B35ADACA5864965E494A2 | kaemmererh@mir.wustl.edu    | Helen     | Kaemmerer    | N/A          | N/A
+ fryej      | DBBB9E07BE7DF1C103C3B05470F41361 | fryej@mir.wustl.edu         | Jennifer  | Frye         | 314-747-1604 | N/A
+ kbohnert   | 828E0024BF266E8C6A491E7460293E39 | bohnertk@wustl.edu          | Kathryn   | Bohnert      | N/A          | N/A
+ Holdenerr  | BD01A9E520E94296B00ABB625B9734B5 | holdenerr@mir.wustl.edu     | Ruth      | Holdener     | 747-2034     | N/A
+ ktaylor01  | 609495C799F02D8712997538EECB1AC8 | taylork@wustl.edu           | Kathy     | Taylor       | N/A          | N/A
+ ejacobs01  | BAC3AED06FBB1DCB3C8FFE82374F99A4 | jacobse@wustl.edu           | Eileen    | Jacobs       | N/A          | N/A
+ rhaver01   | 63BF67E5400480E73751382FF32F8741 | havermanr@wustl.edu         | Robin     | Haverman     | N/A          | N/A
+ dbird01    | DDC69C0B75068479DF1492E702EA815B | birdd@wustl.edu             | Darlene   | Bird         | N/A          | N/A
+ Gallagherl | 91ED7F16F8AE93CA7FD1E7343DDE451E | gallagherl@mir.wustl.edu    | Lora      | Gallagher    | 314.747.4065 | N/A
+ priorf     | 97AEFD019F7D234FDA405371C804D13D | priorf@mir.wustl.edu        | Fred      | Prior        | N/A          | N/A
+ smm        | 4DD588894B8A41DABD288AF7AD54209B | moores@mir.wustl.edu        | Steve     | Moore        | 7-0325       | N/A
+ rmoult01   | 25FC2C5CD790E2A40C7085AA3541140F | moultonr@mir.wustl.edu      | Ralph     | Moulton      | N/A          | N/A
+ admin      | 21232F297A57A5A743894A0E4A801FC3 | default@default.com         | default   | default      | N/A          | N/A
+ acampbell1 | 6F5EB0788E970590A3D2477910AAA347 | campbella@wustl.edu         | Angela    | Campbell     | N/A          | N/A
+ amcarlson1 | D14DE0F0130D53A14060A1D847BD2667 | carlsona@mir.wustl.edu      | Anna      | Carlson      | 314-747-8273 | N/A
+ lschimm1   | C78CEAB15743256963E7262612800D25 | schimmoellerl@mir.wustl.edu | Linda     | Schimmoeller | N/A          | N/A
+
+mars=# \d roles
+                 Table "public.roles"
+      Column      |         Type          | Modifiers 
+------------------+-----------------------+-----------
+ role_name        | character varying(20) | not null
+ role_description | text                  | 
+Indexes:
+    "roles_pkey" primary key, btree (role_name)
+
+mars=# select * from roles;
+  role_name  |                                                                                                    role_description                                                                                                    
+-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ admin       |  Access to all user options and administrator tools
+ user        | Access to normal user options
+ coordinator | Designates this user as a possible alert recipient. User name and email will be listed on the recipient list. NOTE: ALL USERS, administrators included, need to be marked as a coordinator to be on the recipient list
+(3 rows)
+
+mars=# \d user_roles
+           Table "public.user_roles"
+  Column   |         Type          | Modifiers 
+-----------+-----------------------+-----------
+ user_name | text                  | not null
+ role_name | character varying(20) | not null
+Indexes:
+    "user_roles_pkey" primary key, btree (user_name, role_name)
+Foreign-key constraints:
+    "$1" FOREIGN KEY (user_name) REFERENCES users(user_name)
+    "$2" FOREIGN KEY (role_name) REFERENCES roles(role_name)
+
+mars=# select * from user_roles;
+ user_name  |  role_name  
+------------+-------------
+ aldeap     | user
+ aldeap     | coordinator
+ kbohnert   | user
+ kbohnert   | coordinator
+ Wadej      | user
+ Wadej      | coordinator
+ kaemmererh | user
+ kaemmererh | coordinator
+ fryej      | user
+ fryej      | coordinator
+ Holdenerr  | user
+ Holdenerr  | coordinator
+ ktaylor01  | user
+ ktaylor01  | coordinator
+ dbird01    | user
+ dbird01    | coordinator
+ ejacobs01  | user
+ ejacobs01  | coordinator
+ rhaver01   | user
+ rhaver01   | coordinator
+ amcarlson1 | user
+ amcarlson1 | coordinator
+ Gallagherl | user
+ Gallagherl | coordinator
+ priorf     | admin
+ priorf     | user
+ smm        | admin
+ smm        | user
+ rmoult01   | admin
+ rmoult01   | user
+ rmoult01   | coordinator
+ admin      | coordinator
+ acampbell1 | user
+ acampbell1 | coordinator
+ lschimm1   | user
+ lschimm1   | coordinator
+(36 rows)
+
+mars=# \d notification
+                                              Table "public.notification"
+     Column     |            Type             |                                Modifiers                                
+----------------+-----------------------------+-------------------------------------------------------------------------
+ request_index  | integer                     | not null default nextval('public.notification_request_index_seq'::text)
+ lname          | character varying(50)       | 
+ fname          | character varying(50)       | 
+ mpi            | character varying(20)       | 
+ dob            | date                        | 
+ gender         | character varying(6)        | 
+ submitted_by   | text                        | 
+ user_name      | text                        | 
+ scheduled      | boolean                     | 
+ canceled       | boolean                     | 
+ completed      | boolean                     | 
+ prelim_report  | boolean                     | 
+ final_report   | boolean                     | 
+ addendum       | boolean                     | 
+ revised_report | boolean                     | 
+ time_received  | timestamp without time zone | 
+ rescheduled    | boolean                     | 
+Indexes:
+    "notification_pkey" primary key, btree (request_index)
+Foreign-key constraints:
+    "$1" FOREIGN KEY (submitted_by) REFERENCES users(user_name)
+    "$2" FOREIGN KEY (user_name) REFERENCES users(user_name)
+
+mars=# select * from notification;
+ request_index |    lname     |    fname    |   mpi    |    dob     | gender | submitted_by | user_name  | scheduled | canceled | completed | prelim_report | final_report | addendum | revised_report 
+|      time_received      | rescheduled 
+---------------+--------------+-------------+----------+------------+--------+--------------+------------+-----------+----------+-----------+---------------+--------------+----------+----------------
++-------------------------+-------------
+            16 | Kyle         | Janice      | 1277548  | 1952-11-08 | female | priorf       | priorf     | t         | f        | t         | f             | f            |          |                
+| 2007-08-08 14:56:13.842 | f
+            18 | Madison      | Dwayne      | 3327284  | 1950-07-19 | male   | priorf       | priorf     | t         | f        | t         | f             | f            |          |                
+| 2007-08-08 14:57:30.299 | f
+            30 | Winfield     | Robert      |          | 1932-07-07 | male   | priorf       | kbohnert   | t         | f        | t         | f             | f            |          |                
+| 2007-08-15 13:18:07.145 | f
+            31 | Winfield     | Robert      |          | 1932-07-07 | male   | priorf       | priorf     | t         | f        | t         | f             | f            |          |                
+| 2007-08-15 13:18:07.145 | f
+            47 | Hough        | Laura       | 5676823  | 1968-06-09 | female | Gallagherl   | Wadej      | t         | t        | t         | t             | t            |          |                
+| 2007-09-04 17:06:05.492 | t
+            50 | Harrison     | Karen       | 5734894  | 1951-09-01 | female | Gallagherl   | Wadej      | t         | t        | t         | t             | t            |          |                
+| 2007-09-04 17:06:23.213 | t
+            53 | Sparks       | Judith      | 8446540  | 1954-03-09 | female | Gallagherl   | Wadej      | t         | t        | t         | t             | t            |          |                
+| 2007-09-04 17:06:35.995 | t
+            56 | Bowne        | Steven      | 8438196  | 1954-10-19 | male   | Gallagherl   | Wadej      | t         | t        | t         | t             | t            |          |                
+| 2007-09-04 17:07:22.027 | t
+            62 | KEATON       | SANDRA      | 2154879  | 1950-12-03 | female | admin        | admin      | t         | t        | t         | t             | t            |          |                
+| 2010-08-10 09:55:18.627 | t
+            63 | KEATON       | SANDRA      | 2154879  | 1950-12-03 | female | admin        | rmoult01   | t         | t        | t         | t             | t            |          |                
+| 2010-08-10 09:55:18.627 | t
+            70 | Moulton      | Andrew      | 6572345  | 1950-03-12 | male   | rmoult01     | rmoult01   | f         | f        | f         | f             | t            |          |                
+| 2010-08-10 12:27:09.841 | f
+            76 | Lakin        | Shirley     |          | 1945-12-26 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-08-16 10:45:03.579 | t
+            78 | Sparks       | Thomas      |          | 1939-09-09 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-08-16 10:46:07.216 | t
+            84 | Buckner      | Herman      |          | 1934-01-11 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-08-23 15:49:35.421 | t
+            94 | Hancock      | David       |          | 1940-08-01 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-08-24 12:32:57.454 | t
+           115 | Kniffin      | Ryan        | 8776567  | 1996-11-10 | male   | lschimm1     | lschimm1   | t         | t        | f         | t             | t            |          |                
+| 2010-08-30 07:02:37.844 | t
+           116 | Rosener      | Paige       | 8617999  | 1991-11-03 | female | lschimm1     | lschimm1   | t         | t        | f         | t             | t            |          |                
+| 2010-08-30 07:19:18.828 | t
+           117 | Munzer       | Michael     | 8753588  | 1999-12-07 | male   | lschimm1     | lschimm1   | t         | t        | f         | t             | t            |          |                
+| 2010-08-30 08:16:05.197 | t
+           118 | Jeremy       | Harris      | 8757712  | 1989-08-02 | male   | lschimm1     | lschimm1   | t         | t        | f         | t             | t            |          |                
+| 2010-08-30 08:30:07.049 | t
+           119 | Harris       | Sharron     | 3244830  | 1988-05-13 | female | lschimm1     | lschimm1   | t         | t        | f         | t             | t            |          |                
+| 2010-08-30 08:51:45.37  | t
+           120 | Vanhoose     | Hannah      | 8791205  | 1998-05-07 | female | lschimm1     | lschimm1   | t         | t        | f         | t             | t            |          |                
+| 2010-08-30 09:48:46.728 | t
+           121 | Johnson      | Marcell     | 8774520  | 1993-03-13 | male   | lschimm1     | lschimm1   | t         | t        | f         | t             | t            |          |                
+| 2010-08-30 10:58:49.699 | t
+           122 | Gregory      | Cameron     | 8807368  | 1999-08-12 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-30 11:14:01.763 | t
+           123 | Harris       | Jaurice     | 8364701  | 1991-08-09 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-30 11:21:01.982 | t
+           124 | Walker       | Keenan      | 8793504  | 1993-07-02 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-30 11:37:42.395 | t
+           125 | Wellen       | Alexa       | 8809335  | 1990-09-06 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-30 11:46:19.702 | t
+           126 | Lovings      | Amari       | 8748160  | 2005-03-27 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-30 11:52:00.469 | t
+           127 | Bourgeois    | Evan        | 8664609  | 1997-07-25 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-30 12:04:44.119 | t
+           128 | Steele       | Morgan      | 8464000  | 1989-10-24 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 06:51:37.658 | t
+           129 | Bland        | Nakea       | 8488396  | 1984-03-05 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 07:05:03.439 | t
+           130 | Jones        | Lindsay     | 8520725  | 1994-07-18 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 07:15:22.512 | t
+           131 | Sides        | Richard     |          | 1980-03-19 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 07:18:15.89  | t
+           132 | Collins      | Ruth        | 3104867  | 1978-08-13 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 07:26:00.663 | t
+           133 | Blakemore    | Zachary     | 8639809  | 2000-06-21 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 08:07:13.353 | t
+           134 | Tyler        | Justin      | 8474789  | 1996-11-05 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 08:11:51.09  | t
+           135 | Lasley       | Kelly       | 2829634  | 1989-05-04 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 08:14:20.659 | t
+           136 | Mahoney      | Erin        | 3020933  | 1986-08-07 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 08:21:14.125 | t
+           137 | Schofield    | Nathan      | 8746816  | 1993-05-12 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 08:58:03.102 | t
+           138 | Ronchetto    | Nickolas    | 8818186  | 1990-05-01 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 09:01:15.327 | t
+           139 | Greenwalt    | Donald      | 2684253  | 1984-08-23 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 09:35:01.485 | t
+           140 | Blakemore    | Natalie     | 2925102  | 1977-05-15 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 09:46:48.816 | t
+           141 | Conway       | Alexander   | 8631972  | 1996-04-16 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 10:03:38.073 | t
+           143 | Bruemmer     | Nicole      | 8493137  | 1996-07-31 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 10:26:32.457 | t
+           144 | Day          | Christy     | 12195118 | 1953-03-10 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 10:40:32.891 | t
+           145 | Enochs       | Phyllis     | 2362509  | 1933-07-10 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 10:49:40.645 | t
+           146 | Wagner       | Garrett     | 8457281  | 1996-05-26 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 11:00:01.172 | t
+           147 | Thomas       | Chefon      | 8330459  | 1991-07-19 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 11:20:52.44  | t
+           148 | Williams     | Rachael     | 8819028  | 1990-09-21 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 11:28:48.989 | t
+           149 | Knecht       | Hailey      | 8634346  | 2001-01-21 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 11:36:17.39  | t
+           150 | Maguire      | Alicia      | 8779126  | 1991-08-13 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 12:09:52.841 | t
+           151 | Jenkins      | Dylan       | 8824187  | 2002-09-10 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 12:23:43.186 | t
+           152 | Sides        | Michael     | 8368220  | 1991-10-29 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 13:15:27.851 | t
+           153 | mccully      | job         | 8815276  | 1998-05-02 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-08-31 13:20:59.605 | t
+           154 | Wu           | Andrew      | 8826644  | 2006-06-23 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-09-01 08:01:07.922 | t
+           155 | Beach        | Christopher | 8830693  | 2006-10-04 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-09-01 08:34:13.498 | t
+           156 | Crawford     | Mikeshia    | 8737402  | 1992-11-03 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-09-01 11:38:21.11  | t
+           157 | Thompson     | Dawson      | 8839857  | 2008-02-06 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-09-01 12:36:51.17  | t
+           158 | Bartels      | Loren       | 2121391  | 1939-05-26 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:13:34.386 | t
+           159 | Boland       | charles     | 3029268  | 1963-01-31 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:14:13.933 | t
+           160 | Brashear     | Garry       | 2969317  | 1947-09-01 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:14:54.372 | t
+           161 | Brennan      | Richard     | 2911358  | 1952-08-27 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:15:34.369 | t
+           165 | Deboard      | Jason       | 3040649  | 1973-01-15 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:19:42.903 | t
+           166 | Dunnagan     | Gerald      | 2844760  | 1949-04-03 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:20:16.84  | t
+           167 | Fisher       | Diane       | 20081926 | 1941-10-23 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:21:27.873 | t
+           168 | Dala         | Freesmeier  | 3275309  | 1978-04-20 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:23:12.39  | t
+           169 | Hale         | Danny       | 3265902  | 1950-08-22 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:23:47.603 | t
+           170 | Hamby        | Dennis      | 11101592 | 1947-04-20 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:24:37.987 | t
+           171 | Harris       | Ramona      | 20092174 | 1954-12-03 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:26:14.747 | t
+           172 | Hess         | Bonnie      | 20082194 | 1960-12-11 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:27:09.699 | t
+           173 | Hill         | Michelle    | 3109561  | 1966-06-06 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:27:53.363 | t
+           174 | Hilliard     | Tina        | 3267055  | 1967-06-30 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:28:21.504 | t
+           175 | Hoffman      | Sharon      | 2985215  | 1960-11-23 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:29:05.058 | t
+           177 | Hurt         | Michael     | 2863896  | 1942-04-06 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:31:56.447 | t
+           178 | Johnson      | Kristi      | 2723010  | 1985-10-08 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:32:31.298 | t
+           179 | Keating      | Nancy       | 3098044  | 1935-11-27 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:33:01.024 | t
+           180 | KellyKillion | Jacqueline  | 27624500 | 1962-03-28 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:34:07.189 | t
+           182 | Monahan      | John        | 3250573  | 1952-12-11 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:41:17.445 | t
+           183 | Moore        | Lisa        | 3015162  | 1960-02-08 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:42:06.10  | t
+           187 | Proctor      | Erica       | 3273873  | 1978-01-04 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:49:01.233 | t
+           190 | Russell      | Jill        | 3242280  | 1950-05-27 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:51:16.401 | t
+           191 | Schwier      | Michael     | 3160225  | 1973-07-18 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:52:24.593 | t
+           192 | Smith        | Charles     | 1027248  | 1946-06-08 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:53:11.346 | t
+           193 | Spence       | Leon        | 3122752  | 1956-09-20 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:53:42.465 | t
+           194 | Usery        | Rhonda      | 3029328  | 1959-04-10 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:54:13.808 | t
+           195 | Walker       | Michelle    | 3250754  | 1967-10-31 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:54:39.57  | t
+           196 | Welge        | Robert      | 3264942  | 1963-01-15 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:55:46.796 | t
+           198 | Wilburn      | Bobbie      | 3230598  | 1932-08-23 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:56:46.498 | t
+           199 | Wodicker     | Edward      | 3265199  | 1952-06-04 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-07 10:57:09.217 | t
+           200 | Wojtowicz    | Gail        | 3134583  | 1955-01-14 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:57:49.037 | t
+           201 | Wood         | James       | 3080698  | 1964-04-22 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-07 10:58:21.776 | t
+           202 | Koesterer    | Jacob       | 3137716  | 1988-12-23 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-08 13:32:55.138 | t
+           203 | Nolen        | Mackenzie   | 8843261  | 1999-08-16 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-09-09 08:33:44.525 | t
+           204 | Meriweather  | Kimberly    | 8187516  | 1993-12-27 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-09-09 11:07:09.40  | t
+           205 | Graman       | MaryLouise  |          | 1942-01-12 | female | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-16 11:04:50.011 | t
+           207 | Horsefield   | Timothy     | 3104888  | 1959-08-06 | male   | amcarlson1   | amcarlson1 | t         | t        | f         | f             | t            |          |                
+| 2010-09-16 11:06:40.429 | t
+           208 | Carter       | Randy       | 12590962 | 1961-10-26 | male   | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-21 15:07:44.842 | t
+           209 | Penberthy    | Linda       | 12638293 | 1956-06-15 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-21 15:08:44.174 | t
+           210 | Ruach        | Betty       | 11667185 | 1947-09-17 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-21 15:10:03.492 | t
+           211 | Eppert       | Victoria    | 12535214 | 1959-12-14 | female | amcarlson1   | amcarlson1 | t         | t        | t         | f             | t            |          |                
+| 2010-09-21 15:11:05.10  | t
+           213 | Allen        | Brittany    | 3256100  | 1990-03-06 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-09-30 10:31:33.636 | t
+           214 | Price        | David       | 8882522  | 2008-10-01 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-04 13:09:33.344 | t
+           215 | Glenn        | Jessica     | 8852386  | 1990-09-29 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-05 07:38:37.501 | t
+           216 | Tyler        | Joel        | 8867673  | 2008-02-01 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-05 07:56:20.628 | t
+           217 | Otey         | Lauren      | 8833927  | 2003-11-15 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-05 09:06:29.912 | t
+           218 | Herbst       | Damian      | 8817894  | 1998-06-13 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-05 09:37:11.927 | t
+           219 | Woodworth    | Hailey      | 8515342  | 1994-03-23 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-05 09:57:02.74  | t
+           220 | Carter       | Jamie Lynn  | 8758164  | 1993-01-14 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-05 10:12:02.508 | t
+           221 | Taylor       | Candace     | 8881082  | 1993-11-16 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-05 12:35:13.298 | t
+           222 | Durk         | Sarah       | 2846644  | 1986-09-15 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-11 12:25:18.697 | t
+           223 | Sarah        | Dunn        | 2846644  | 1986-09-15 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-11 12:27:09.18  | t
+           224 | Nelson       | Tiana       | 8903339  | 2001-04-02 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-11 14:53:41.853 | t
+           225 | Langley      | Kayden      | 8901220  | 2009-10-08 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-12 09:57:41.526 | t
+           226 | St. James    | Henry       | 8903747  | 1992-10-02 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-12 10:06:06.362 | t
+           227 | Ohms         | Christian   | 8869314  | 2003-12-29 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-12 10:38:27.276 | t
+           228 | Friedman     | Lauren      | 8387837  | 1994-06-22 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-12 11:03:19.933 | t
+           229 | Kelly        | Kristen     |          | 1995-04-10 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-21 08:10:16.053 | t
+           230 | Crawford     | Alex        | 8681415  | 2002-12-17 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-22 10:05:12.324 | t
+           231 | Chwascinski  | Jenna       |          | 1994-09-20 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-25 07:18:32.016 | t
+           232 | Graham       | Ivy         | 8929026  | 1999-03-01 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 07:15:49.552 | t
+           233 | Mccurdy      | Jameson     | 8929016  | 1998-09-09 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 07:26:41.206 | t
+           234 | Colombatto   | Derek       | 8753767  | 1992-07-03 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 09:07:39.727 | t
+           235 | Tinker       | Aaron       | 8911587  | 2007-08-20 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 09:25:44.146 | t
+           236 | Pruitt       | Mya         | 8870297  | 1993-03-19 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 09:45:30.517 | t
+           237 | Williams     | Jamsine     | 8707023  | 2003-08-16 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 09:52:57.366 | t
+           238 | Taylor       | Bo          | 8899998  | 2003-09-03 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 10:05:49.057 | t
+           239 | Brott        | Tyler       | 8528199  | 1997-08-04 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-10-26 10:47:21.755 | t
+           240 | Harris       | Jordan      |          | 2009-09-01 | male   | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-11-02 09:58:12.062 | t
+           241 | Matlock      | Christina   |          | 1977-11-21 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2010-12-08 08:08:51.593 | t
+           242 | Hayden       | Makenzie    | 8894971  | 1996-04-12 | female | lschimm1     | lschimm1   | t         | t        | t         | t             | t            |          |                
+| 2011-01-11 10:17:29.578 | t
+(129 rows)
+
+mars=# \d matching_hl7_index
+                                              Table "public.matching_hl7_index"
+     Column      |            Type             |                                  Modifiers                                  
+-----------------+-----------------------------+-----------------------------------------------------------------------------
+ matching_id     | integer                     | not null default nextval('public.matching_hl7_index_matching_id_seq'::text)
+ user_name       | text                        | 
+ lname           | character varying(50)       | 
+ fname           | character varying(50)       | 
+ mpi             | character varying(20)       | 
+ dob             | date                        | 
+ gender          | character varying(6)        | 
+ accession_num   | character varying(30)       | 
+ ssn             | character varying(15)       | 
+ attending_phys  | character varying(50)       | 
+ requesting_phys | character varying(50)       | 
+ exam_type       | character varying(20)       | 
+ diagnosis       | character varying(100)      | 
+ event           | text                        | 
+ time_received   | timestamp without time zone | 
+Indexes:
+    "matching_hl7_index_pkey" primary key, btree (matching_id)
+Foreign-key constraints:
+    "$1" FOREIGN KEY (user_name) REFERENCES users(user_name)
+
+mars=# select * from matching_hl7_index;
+ matching_id | user_name  |   lname   | fname  |   mpi   |    dob     | gender | accession_num |     ssn     |   attending_phys    |   requesting_phys   |    exam_type    |            diagnosis      
+      |       event        |       time_received        
+-------------+------------+-----------+--------+---------+------------+--------+---------------+-------------+---------------------+---------------------+-----------------+---------------------------
+------+--------------------+----------------------------
+        8838 | Holdenerr  | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742116      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Abdomen with | PER SANDRA                
+      | Scheduled          | 2007-09-13 16:55:27.537613
+        8839 | Wadej      | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742116      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Abdomen with | PER SANDRA                
+      | Scheduled          | 2007-09-13 16:55:27.592796
+        8841 | Holdenerr  | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742115      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Chest with   | PER SANDRA                
+      | Scheduled          | 2007-09-13 16:56:27.665142
+        8842 | Wadej      | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742115      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Chest with   | PER SANDRA                
+      | Scheduled          | 2007-09-13 16:56:27.688531
+        8844 | Holdenerr  | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742116      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Abdomen with | PER SANDRA                
+      | Scheduled          | 2007-09-13 17:15:28.565631
+        8845 | Wadej      | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742116      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Abdomen with | PER SANDRA                
+      | Scheduled          | 2007-09-13 17:15:28.588678
+        8847 | Holdenerr  | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742115      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Chest with   | PER SANDRA                
+      | Scheduled          | 2007-09-13 17:16:28.679199
+        8848 | Wadej      | SPARKS    | JUDITH | 8446540 | 1954-03-09 | F      | 10742115      | 320-50-8155 | GOVINDAN, RAMASWAMY | GOVINDAN, RAMASWAMY | CT Chest with   | PER SANDRA                
+      | Scheduled          | 2007-09-13 17:16:28.702073
+
+NOT ALL RECORDS SHOWN HERE
+
+

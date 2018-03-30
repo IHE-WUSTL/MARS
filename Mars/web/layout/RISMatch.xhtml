@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+   <h:head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <link href="./../resources/css/default.css" rel="stylesheet" type="text/css" />
+      <link href="./../resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+   </h:head>
+
+   <!--
+   RIS Match template
+   Allows the display of a table of patients from the RIS which are possible
+   matches for the patient in a Request object. User can then select one of
+   the patients as a match, or cancel the match operation.
+
+   Use as a template with the ui:decorate tab.
+   Expects ui:param
+      - RISMatch which is the name of a RISMatch object, or null
+   -->
+
+   <h:body>
+
+      <ice:panelGroup>
+
+         <ice:outputText rendered="#{RISMatch == null}" value=" "/>
+
+         <ice:panelGrid columns="2" rendered="#{RISMatch != null}">
+
+            <!-- table of possible matches from RIS -->
+            <ice:dataTable id="matchtable"
+                           var="patient"
+                           value="#{RISMatch.patients}"
+                           scrollable="true"
+                           scrollHeight="310px"
+                           columnWidths="100px, 400px, 100px, 100px, 75px"
+                           sortColumn="#{RISMatch.sortColumnName}"
+                           sortAscending="#{RISMatch.ascending}">
+
+               <f:facet name="header">
+                  <ice:outputText value="Possible matches in RIS" style="text-align: center"/>
+               </f:facet>
+
+               <ice:column style="width: 100px">
+
+                  <ice:rowSelector
+                     id="selected"
+                     value="#{patient.selected}"
+                     selectionAction="#{RISMatch.patientSelected}"
+                     preStyleOnSelection="true"/>
+
+                  <f:facet name="header">
+                     <ice:commandSortHeader columnName="ptMedRecNo">
+                        <ice:outputText value="MPI"/>
+                     </ice:commandSortHeader>
+                  </f:facet>
+
+                  <ice:outputText value="#{patient.ptMedRecNo}"/>
+               </ice:column>
+
+               <ice:column style="width: 400px">
+                  <f:facet name="header">
+                     <ice:commandSortHeader columnName="name">
+                        <ice:outputText value="Patient Name"/>
+                     </ice:commandSortHeader>
+                  </f:facet>
+                  <ice:outputText value="#{patient.ptLast}, #{patient.ptFirst} #{patient.ptMiddle}"/>
+               </ice:column>
+
+               <ice:column style="width: 100px">
+                  <f:facet name="header">
+                     <ice:commandSortHeader columnName="ptBirthDtime">
+                        <ice:outputText value="DOB"/>
+                     </ice:commandSortHeader>
+                  </f:facet>
+                  <ice:outputText value="#{patient.ptBirthDtime}">
+                     <f:convertDateTime pattern="MM/dd/yyyy"/>
+                  </ice:outputText>
+               </ice:column>
+
+               <ice:column style="width: 75px">
+                  <f:facet name="header">
+                     <ice:commandSortHeader columnName="ptSex">
+                        <ice:outputText value="Gender"/>
+                     </ice:commandSortHeader>
+                  </f:facet>
+                  <ice:outputText value="#{patient.ptSex}"/>
+               </ice:column>
+
+            </ice:dataTable>
+
+            <!-- Operator lead through message -->
+            <ice:outputText
+               rendered="#{RISMatch.selectPatient}"
+               value="Select RIS patient to match to request, or Cancel"/>
+            <ice:outputText
+               rendered="#{RISMatch.matchPatient}"
+               value="Match to match selected patient to Request, or Cancel"/>
+
+            <ice:panelGrid columns="2">
+               <ice:commandButton
+                  value="Match"
+                  actionListener="#{RISMatch.match}"
+                  disabled="#{!RISMatch.matchPatient}"/>
+               <ice:commandButton
+                  value="Cancel"
+                  actionListener="#{RISMatch.cancel}"/>
+
+            </ice:panelGrid>
+
+
+         </ice:panelGrid>
+
+      </ice:panelGroup>
+
+
+   </h:body>
+
+</html>

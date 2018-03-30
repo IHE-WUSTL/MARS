@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+    Document   : Users
+    Created on : Feb 14, 2011, 1:07:29 PM
+    Author     : rmoult01
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+   <body>
+
+      <ui:composition template="./layout/lambdaTemplate.xhtml">
+
+         <ui:define name="content">
+
+            <!-- Pick action for this user -->
+
+            <ice:panelGroup rendered="#{myUserBean.renderSelectAction()}">
+
+               <ice:outputText
+                  value="Select action to take for user:
+                               #{myUserBean.chgUser.firstName}
+                               #{myUserBean.chgUser.lastName}"/>
+
+               <!-- When user selected, show action to take buttons -->
+               <ice:panelGrid columns="3">
+
+                  <ice:commandButton value="Update User"
+                                     actionListener="#{myUserBean.chgUser}"/>
+                  <ice:commandButton value="Delete User"
+                                     actionListener="#{myUserBean.delUser}"/>
+                  <ice:commandButton value="Reset Password"
+                                     actionListener="#{myUserBean.chgPw}"/>
+               </ice:panelGrid>
+
+            </ice:panelGroup>
+
+            <!-- Allow modifications to user data (except pw) -->
+
+            <ice:panelGrid rendered="#{myUserBean.renderModifyUser()}"
+                           columns="2">
+
+               <ice:outputLabel value="User Id" for="cId"/>
+               <ice:inputText id="cId" size="10" maxlength="10"
+                              value="#{myUserBean.chgUser.id}"/>
+
+               <ice:outputLabel value="First Name" for="cFirstName"/>
+               <ice:inputText id="cfirstName" size="32" maxlength="32"
+                              value="#{myUserBean.chgUser.firstName}"/>
+
+               <ice:outputLabel value="Last Name" for="clastName"/>
+               <ice:inputText id="cLastName" size="32" maxlength="32"
+                              value="#{myUserBean.chgUser.lastName}"/>
+
+               <ice:outputLabel value="Email Address" for="cEmail"/>
+               <ice:inputText id="cEmail" size="15" maxlength="32"
+                              value="#{myUserBean.chgUser.email}"/>
+
+               <ice:commandButton value="OK"
+                                  actionListener="#{myUserBean.chgOk}"/>
+               <ice:commandButton value="Cancel"
+                                  actionListener="#{myUserBean.canChg}"/>
+
+            </ice:panelGrid>
+
+            <!-- Allow delete of user -->
+
+            <ice:panelGrid rendered="#{myUserBean.renderDeleteUser()}"
+                           columns="2">
+
+               <ice:outputText value="User Id"/>
+               <ice:outputText value="#{myUserBean.chgUser.id}"/>
+
+               <ice:outputText value="First Name"/>
+               <ice:outputText value="#{myUserBean.chgUser.firstName}"/>
+
+               <ice:outputText value="Last Name"/>
+               <ice:outputText value="#{myUserBean.chgUser.lastName}"/>
+
+               <ice:outputText value="Email Address"/>
+               <ice:outputText value="#{myUserBean.chgUser.email}"/>
+
+               <ice:commandButton value="Delete this User"
+                                  action="index"
+                                  actionListener="#{myUserBean.delOk}"/>
+               <ice:commandButton value="Cancel"
+                                  actionListener="#{myUserBean.canChg}"/>
+            </ice:panelGrid>
+
+            <!-- Allow Reset of user pw -->
+
+            <ice:panelGrid columns="2"
+                           rendered="#{myUserBean.renderResetUserPw()}">
+
+               <ice:outputLabel value="New Password" for="nPw"/>
+               <ice:inputSecret id="nPw" size="10" maxlength="10"
+                                value="#{myUserBean.newPw}"/>
+
+               <ice:outputLabel value="Confirm Password" for="ncPw"/>
+               <ice:inputSecret id="ncPw" size="10" maxlength="10"
+                                value="#{myUserBean.confirmPw}"/>
+
+               <ice:commandButton value="Reset Password"
+                                  actionListener="#{myUserBean.resetPw}"/>
+               <ice:commandButton value="Cancel"
+                                  actionListener="#{myUserBean.canChg}"/>
+            </ice:panelGrid>
+         </ui:define>
+
+      </ui:composition>
+
+   </body>
+</html>
+

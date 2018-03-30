@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+   <h:head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <link href="./resources/css/mars.css" rel="stylesheet" type="text/css" />
+      <link href="./resources/css/default.css" rel="stylesheet" type="text/css" />
+      <link href="./resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+      <link href="./resources/css/xp/xp.css" rel="stylesheet" type="text/css" />
+      <title>MIR Alert Request System</title>
+   </h:head>
+
+   <h:body>
+
+      <div id="top">
+         <img src="./resources/imgs/MIR_logo.jpg" width="96" height="96" alt="MIR_logo"/>
+         <ice:outputText value="Mallinckrodt Alert Request System"
+                         style="color:white;font-size:30px;font-weight:bolder;padding:20px"/>
+         <ice:outputText rendered="#{sessionBean.loggedIn}"
+                         style="color:white;font-size:14px;font-weight:bold;padding:20px">
+            Logged in as: #{sessionBean.userName}
+         </ice:outputText>
+         <ice:outputText value="Not logged in" rendered="#{!sessionBean.loggedIn}"
+                         style="color:white;font-size:14px;font-weight:bold;padding:20px"/>
+      </div>
+
+      <div id="left">
+         <ice:form>
+            <ice:panelGrid columns="1" rendered="#{sessionBean.loggedIn}">
+               <ice:commandButton value="Alert Requests" action="Request"/>
+               <ice:commandButton value="Received Alerts" action="Alerts"/>
+               <ice:panelGrid columns ="1" rendered="#{sessionBean.admin}">
+                  <ice:commandButton value="Studies" action="Study"/>
+                  <ice:commandButton value="Users" action="Users"/>
+               </ice:panelGrid>
+               <ice:panelGrid columns ="1" rendered="#{!sessionBean.admin}">
+                  <ice:commandButton value="My Studies" action="MyStudies"/>
+                  <ice:commandButton value="My User Data" action="MyUser"/>
+               </ice:panelGrid>
+               <ice:commandButton value="Log Off" 
+                                  action="index"
+                                  actionListener="#{sessionBean.logoff}"/>
+            </ice:panelGrid>
+         </ice:form>
+      </div>
+
+      <div class="left_content">
+         <ice:form>
+            <h:messages globalOnly="true" style="color:red"/>
+            <ice:panelGroup rendered="#{!sessionBean.loggedIn}">
+               <ice:panelGrid columns="2">
+                  <ice:outputLabel value="User ID" for="userId"/>
+                  <ice:inputText id="userId" size="15" maxlength="15"
+                                 value="#{sessionBean.id}"/>
+                  <ice:outputLabel value="Password" for="pw"/>
+                  <ice:inputSecret id="pw" size="15" maxlength="15"
+                                   value="#{sessionBean.pw}"/>
+                  <ice:commandButton id="login" value="Log In"
+                                     actionListener="#{sessionBean.login}"/>
+               </ice:panelGrid>
+               Welcome to the Mallinckrodt Alert Request system. Please log in with
+               your user id and password.
+            </ice:panelGroup>
+            <f:subview id="top" rendered="#{sessionBean.loggedIn}">
+               <ui:insert name="content">Content</ui:insert>
+            </f:subview>
+         </ice:form>
+      </div>
+
+      <div id="bottom">
+         <ice:panelGroup rendered="#{!sessionBean.loggedIn}">
+            <ice:graphicImage styleClass="marsFooterImg" value="./resources/imgs/netbeans.jpeg"/>
+            <ice:graphicImage styleClass="marsFooterImg" value="./resources/imgs/j2ee.jpeg"/>
+            <ice:graphicImage styleClass="marsFooterImg" value="./resources/imgs/apache.jpeg"/>
+            <ice:graphicImage styleClass="marsFooterImg" value="./resources/imgs/icefaces.jpeg"/>
+            <ice:graphicImage styleClass="marsFooterImg" value="./resources/imgs/mysql.jpeg"/>
+            <ice:graphicImage styleClass="marsFooterImg" value="./resources/imgs/glassfishv3.jpeg"/>
+            <ice:graphicImage styleClass="marsFooterImg" value="./resources/imgs/hibernate.png"/>
+         </ice:panelGroup>
+      </div>
+      
+   </h:body>
+
+</html>

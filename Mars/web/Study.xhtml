@@ -1,0 +1,329 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+    Document   : Study
+    Created on : Feb 19, 2011, 1:03:27 PM
+    Author     : rmoult01
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      xmlns:h="http://java.sun.com/jsf/html">
+   <body>
+
+      <ui:composition template="./layout/lambdaTemplate.xhtml">
+
+         <ui:define name="content">
+
+            <ice:panelTabSet selectedIndex="#{studiesBean.selectedTab}"
+                             tabChangeListener="#{studiesBean.tabChangeListener}">
+
+               <!-- Add Studies -->
+
+               <ice:panelTab label="Add New Studies">
+
+                  <ice:panelGrid columns="2">
+
+                     <ice:outputLabel value="Study Id" for="aId"/>
+                     <ice:inputText id="aId" size="10" maxlength="10"
+                                    value="#{studiesBean.newStudy.id}"/>
+
+                     <ice:outputLabel value="Description" for="aDescription"/>
+                     <ice:inputTextarea id="aDescription" maxlength="250"
+                                        value="#{studiesBean.newStudy.description}"/>
+
+                     <ice:outputLabel value="Active?" for="aActive"/>
+                     <ice:selectBooleanCheckbox id="aActive"
+                                                value="#{studiesBean.newStudy.active}"/>
+
+                     <ice:commandButton value="OK"
+                                        actionListener="#{studiesBean.addNewStudy}"/>
+                     <ice:commandButton value="Cancel"
+                                        actionListener="#{studiesBean.canAdd}"/>
+                  </ice:panelGrid>
+               </ice:panelTab>
+
+
+               <ice:panelTab label="Modify Studies">
+
+                  <!-- Show table of existing users to select one for modification -->
+
+                  <ice:panelGroup rendered="#{studiesBean.renderSelectStudy()}">
+
+                     <ice:panelGrid columns="2">
+
+                        <ice:dataTable id="studyTable"
+                                       var="study"
+                                       value="#{studiesBean.allStudies}"
+                                       scrollable="true"
+                                       scrollHeight="310px"
+                                       columnWidths="75px, 400px, 75px"
+                                       sortColumn="#{studiesBean.sortColumnName}"
+                                       sortAscending="#{studiesBean.ascending}">
+                           <f:facet name="header">
+                              <ice:outputText value="Current Studies" style="text-align: center"/>
+                           </f:facet>
+
+                           <ice:column style="width: 75px">
+
+                              <ice:rowSelector id="selected"
+                                               value="#{study.selected}"
+                                               selectionAction="#{studiesBean.studySelected}"
+                                               preStyleOnSelection="true"/>
+
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="id">
+                                    <ice:outputText value="Study Id"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{study.id}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 400px">
+                              <f:facet name="header">
+                                 <ice:outputText value="Study Description"/>
+                              </f:facet>
+                              <ice:outputText value="#{study.description}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 75px">
+                              <f:facet name="header">
+                                 <ice:outputText value="Active?"/>
+                              </f:facet>
+                              <ice:outputText value="#{study.active}"/>
+                           </ice:column>
+
+                        </ice:dataTable>
+
+                        <ice:outputText rendered="#{studiesBean.renderMessage1()}"
+                                        value="Select study to modify"/>
+                        <ice:outputText rendered="#{studiesBean.renderMessage2()}"
+                                        value="Select action to take for study #{study.id}"/>
+
+                     </ice:panelGrid>
+
+                     <!-- Action buttons -->
+
+                     <ice:panelGrid rendered="#{studiesBean.renderCommandButtons()}"
+                                    columns="3">
+
+                        <ice:commandButton value="Update Study"
+                                           actionListener="#{studiesBean.chgStudy}"/>
+                        <ice:commandButton value="Delete Study"
+                                           actionListener="#{studiesBean.delStudy}"/>
+                        <ice:commandButton value="Users Assigned to Study"
+                                           actionListener="#{studiesBean.chgUsers}"/>
+                     </ice:panelGrid>
+
+                  </ice:panelGroup>
+
+                  <!-- Modifications to study data -->
+
+                  <ice:panelGrid rendered="#{studiesBean.renderModifyStudy()}"
+                                 columns="2">
+
+                     <ice:outputLabel value="Study Id" for="cId"/>
+                     <ice:inputText id="cId" size="10" maxlength="10"
+                                    value="#{studiesBean.chgStudy.id}"/>
+
+                     <ice:outputLabel value="Description" for="cDesc"/>
+                     <ice:inputTextarea id="cDesc" style="width: 400px"
+                                        value="#{studiesBean.chgStudy.description}"/>
+
+                     <ice:outputLabel value="Active?" for="cActive"/>
+                     <ice:selectBooleanCheckbox id="cActive"
+                                                value="#{studiesBean.chgStudy.active}"/>
+
+                     <ice:commandButton value="OK"
+                                        actionListener="#{studiesBean.chgOk}"/>
+                     <ice:commandButton value="Cancel"
+                                        actionListener="#{studiesBean.canChg}"/>
+
+                  </ice:panelGrid>
+
+                  <!-- Delete study -->
+
+                  <ice:panelGrid rendered="#{studiesBean.renderDeleteStudy()}"
+                                 columns="2">
+
+                     <ice:panelGrid rendered="#{studiesBean.renderDeleteStudy()}"
+                                    columns="2">
+
+                        <ice:outputText value="Study Id"/>
+                        <ice:outputText value="#{studiesBean.chgStudy.id}"/>
+
+                        <ice:outputText value="Description"/>
+                        <ice:outputText value="#{studiesBean.chgStudy.description}"/>
+
+                        <ice:outputText value="Active?" />
+                        <ice:outputText value="#{studiesBean.chgStudy.active}"/>
+
+                        <ice:commandButton value="Delete this Study"
+                                           actionListener="#{studiesBean.delOk}"/>
+                        <ice:commandButton value="Cancel"
+                                           actionListener="#{studiesBean.canChg}"/>
+                     </ice:panelGrid>
+                     <b>Warning:</b> Delete of a Study cannot be undone.<br/>
+                     Deleting a study automatically and permanently deletes all
+                     alert requests which have been entered for that study.<p/>
+                     If alerts are not required for this study at the present
+                     time, but might be required again in the future, set the
+                     study Active flag to false. This will stop all alerts, but
+                     keep the requests on file.  Alerts may then be restarted
+                     simply by setting the Active flag back to true.
+                  </ice:panelGrid>
+
+                  <!-- Maintain users assigned to study and their roles -->
+
+                  <ice:panelGroup rendered="#{studiesBean.renderChgUsers()}">
+                     Maintain users assign to the #{studiesBean.chgStudy.id} study:<br/>
+                     #{studiesBean.chgStudy.description}
+
+                     <ice:panelGrid columns="3">
+
+                        <!-- Table of users not assigned to the study -->
+
+                        <ice:dataTable
+                           var="user"
+                           value="#{studiesBean.availableUsers}"
+                           scrollable="true"
+                           scrollHeight="310px"
+                           columnWidths="75px, 100px"
+                           sortColumn="#{studiesBean.scn}"
+                           sortAscending="#{studiesBean.asc}">
+                           <f:facet name="header">
+                              <ice:outputText value="Available Users"/>
+                           </f:facet>
+
+                           <ice:column style="width: 75px">
+
+                              <ice:rowSelector
+                                 id="selected"
+                                 value="#{user.selected}"
+                                 selectionAction="#{studiesBean.availableUserSelected}"
+                                 multiple="true"
+                                 preStyleOnSelection="true"/>
+
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="id">
+                                    <ice:outputText value="User Id"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{user.id}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 100px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="name">
+                                    <ice:outputText value="User Name"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{user.firstName} #{user.lastName}"/>
+                           </ice:column>
+
+                        </ice:dataTable>
+
+                        <!-- Assign, deassign buttons -->
+
+                        <ice:panelGrid columns ="1" width="100px">
+
+                           <ice:outputText value="Assign Selected Users to Study"/>
+                           <ice:commandButton
+                              value="Assign"
+                              disabled="#{studiesBean.disableAssignToStudy()}"
+                              actionListener="#{studiesBean.assignToStudy}"/>
+                           <ice:graphicImage value="resources/css/xp/css-images/spacer.gif"
+                                             style="height: 50px"/>
+                           <ice:outputText value="Remove Selected Users from Study"/>
+                           <ice:commandButton
+                              value="Remove"
+                              disabled="#{studiesBean.disableRemoveFromStudy()}"
+                              actionListener="#{studiesBean.removeFromStudy}"/>
+
+                        </ice:panelGrid>
+
+                        <!-- Assigned users table -->
+
+                        <ice:dataTable
+                           var ="studyUser"
+                           value="#{studiesBean.assignedUsers}"
+                           scrollable="true"
+                           scrollHeight="310px"
+                           columnWidths="75px, 100px, 100px, 75px"
+                           sortColumn="#{studiesBean.sname}"
+                           sortAscending="#{studiesBean.ascend}">
+                           <f:facet name="header">
+                              <ice:outputText value="Users assigned to Study"/>
+                           </f:facet>
+
+                           <ice:column style="width: 75px">
+
+                              <ice:rowSelector
+                                 value="#{studyUser.selected}"
+                                 selectionAction="#{studiesBean.assignedUserSelected}"
+                                 multiple="true"
+                                 preStyleOnSelection="true"
+                                 toggleOnInput="false"/>
+
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="userId">
+                                    <ice:outputText value="User Id"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{studyUser.user.id}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 100px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="userName">
+                                    <ice:outputText value="User Name"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:outputText value="#{studyUser.user.firstName} #{studyUser.user.lastName}"/>
+                           </ice:column>
+
+                           <ice:column style="width: 100px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="userRole">
+                                    <ice:outputText value="User Role"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:selectOneMenu
+                                 value="#{studyUser.userRole}">
+                                 <f:selectItems value="#{studiesBean.userRoles}"/>
+                              </ice:selectOneMenu>
+                           </ice:column>
+
+                           <ice:column style="width: 75px">
+                              <f:facet name="header">
+                                 <ice:commandSortHeader columnName="receiveAlerts">
+                                    <ice:outputText value="Receive Alerts?"/>
+                                 </ice:commandSortHeader>
+                              </f:facet>
+                              <ice:selectBooleanCheckbox
+                                 value="#{studyUser.receiveAlerts}"/>
+                           </ice:column>
+
+                        </ice:dataTable>
+
+                        <ice:panelGrid columns="2">
+                           <ice:commandButton value="OK"
+                                              actionListener="#{studiesBean.saveStudyUserChanges}"/>
+                           <ice:commandButton value="Cancel"
+                                              actionListener="#{studiesBean.cancelStudyUserChanges}"/>
+                        </ice:panelGrid>
+
+                     </ice:panelGrid>
+
+                  </ice:panelGroup>
+
+
+               </ice:panelTab>
+
+            </ice:panelTabSet>
+         </ui:define>
+      </ui:composition>
+
+   </body>
+</html>

@@ -1,0 +1,39 @@
+/* 
+    Document   : mars
+    Created on : Feb 18, 2011, 8:46:52 AM
+    Author     : rmoult01
+    Description:
+        Specific styles for this project
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+.marsFooterImg {
+   padding-top: 1px;
+   padding-bottom: 1px;
+   padding-left: 5px;
+   padding-right: 5px;
+   height: 40px;
+}
+
+.marsImgBtn {
+   background-color: #B2CDF9;
+   border: #000000 medium outset;
+}
+
+.marsImgBtn-Dis {
+   background-color: #CDCDCD;
+   border: #000000 thin solid;
+}
+
+.marsCell {
+   display: table-cell;
+}
+
+.marsDifferentCell {
+   display: table-cell;
+   background-color: #f46706;
+}

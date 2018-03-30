@@ -1,0 +1,9 @@
+# .gitignore for base directory of projects
+# ignore all build, dist, and test directories
+build/
+dist/
+test/
+
+# ignore files ending with ~ or .swp
+*~
+*.swp

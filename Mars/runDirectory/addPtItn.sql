@@ -1,0 +1,4 @@
+USE mars;
+ALTER TABLE request
+   ADD COLUMN ptItn VARCHAR(255) DEFAULT ""
+   AFTER SEX;

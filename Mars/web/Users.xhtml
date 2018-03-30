@@ -1,0 +1,226 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+    Document   : Users
+    Created on : Feb 14, 2011, 1:07:29 PM
+    Author     : rmoult01
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+   <body>
+
+      <ui:composition template="./layout/lambdaTemplate.xhtml">
+
+         <ui:define name="content">
+
+            <ice:panelTabSet selectedIndex="#{usersBean.selectedTab}"
+                             tabChangeListener="#{usersBean.tabChangeListener}">
+
+               <ice:panelTab label="Add New Users">
+
+                  <ice:panelGrid columns="2">
+
+                     <ice:outputLabel value="User Id" for="aId"/>
+                     <ice:inputText id="aId" size="10" maxlength="10"
+                                    value="#{usersBean.newUser.id}"/>
+
+                     <ice:outputLabel value="First Name" for="aFirstName"/>
+                     <ice:inputText id="aFfirstName" size="32" maxlength="32"
+                                    value="#{usersBean.newUser.firstName}"/>
+
+                     <ice:outputLabel value="Last Name" for="alastName"/>
+                     <ice:inputText id="aLastName" size="32" maxlength="32"
+                                    value="#{usersBean.newUser.lastName}"/>
+
+                     <ice:outputLabel value="Password" for="aPw"/>
+                     <ice:inputSecret id="aPw" size="10" maxlength="10"
+                                      value="#{usersBean.newUser.pw}"/>
+
+                     <ice:outputLabel value="Confirm Password" for="acPw"/>
+                     <ice:inputSecret id="acPw" size="10" maxlength="10"
+                                      value="#{usersBean.pw}"/>
+
+                     <ice:outputLabel value="Email Address" for="aEmail"/>
+                     <ice:inputText id="aEmail" size="15" maxlength="32"
+                                    value="#{usersBean.newUser.email}"/>
+
+                     <ice:outputLabel value="Administrator?" for="aAdmin"/>
+                     <ice:selectBooleanCheckbox id="aAdmin"
+                                                value="#{usersBean.newUser.admin}"/>
+
+                     <ice:commandButton value="OK"
+                                        actionListener="#{usersBean.addNewUser}"/>
+                     <ice:commandButton value="Cancel"
+                                        actionListener="#{usersBean.canAdd}"/>
+                  </ice:panelGrid>
+
+               </ice:panelTab>
+
+               <ice:panelTab label="Modify Users">
+
+                  <!-- Show table of existing users to select one for modification -->
+
+                  <ice:panelGroup rendered="#{usersBean.renderSelectUser()}">
+
+                     <ice:panelGrid columns="2">
+
+                           <ice:dataTable id="userTable"
+                                          var="user"
+                                          value="#{usersBean.allUsers}"
+                                          scrollable="true"
+                                          scrollHeight="310px"
+                                          columnWidths="75px, 100px, 200px, 75px"
+                                          sortColumn="#{usersBean.sortColumnName}"
+                                          sortAscending="#{usersBean.ascending}">
+                              <f:facet name="header">
+                                 <ice:outputText value="Current Users"/>
+                              </f:facet>
+
+                              <ice:column style="width: 75px">
+
+                                 <ice:rowSelector id="selected"
+                                                  value="#{user.selected}"
+                                                  selectionAction="#{usersBean.userSelected}"
+                                                  preStyleOnSelection="true"/>
+
+                                 <f:facet name="header">
+                                    <ice:commandSortHeader columnName="id">
+                                       <ice:outputText value="User Id"/>
+                                    </ice:commandSortHeader>
+                                 </f:facet>
+                                 <ice:outputText value="#{user.id}"/>
+                              </ice:column>
+
+                              <ice:column style="width: 100px">
+                                 <f:facet name="header">
+                                    <ice:commandSortHeader columnName="name">
+                                       <ice:outputText value="User Name"/>
+                                    </ice:commandSortHeader>
+                                 </f:facet>
+                                 <ice:outputText value="#{user.firstName} #{user.lastName}"/>
+                              </ice:column>
+
+                              <ice:column style="width: 200px">
+                                 <f:facet name="header">
+                                    <ice:outputText value="Email Address"/>
+                                 </f:facet>
+                                 <ice:outputText value="#{user.email}"/>
+                              </ice:column>
+
+                              <ice:column style="width: 75px">
+                                 <f:facet name="header">
+                                    <ice:outputText value="Administrator?"/>
+                                 </f:facet>
+                                 <ice:outputText value="#{user.admin}"/>
+                              </ice:column>
+                           </ice:dataTable>
+
+
+                        <ice:outputText rendered="#{usersBean.renderMessage1()}"
+                                        value="Select user to modify"/>
+                        <ice:outputText rendered="#{usersBean.renderMessage2()}"
+                                        value="Select action to take for user: #{usersBean.chgUser.firstName} #{usersBean.chgUser.lastName}"/>
+                     </ice:panelGrid>
+
+                     <!-- When user selected, show action to take buttons -->
+                     <ice:panelGrid rendered="#{usersBean.renderCommandButtons()}"
+                                    columns="3">
+
+                        <ice:commandButton value="Update User"
+                                           actionListener="#{usersBean.chgUser}"/>
+                        <ice:commandButton value="Delete User"
+                                           actionListener="#{usersBean.delUser}"/>
+                        <ice:commandButton value="Reset Password"
+                                           actionListener="#{usersBean.chgPw}"/>
+                     </ice:panelGrid>
+
+                  </ice:panelGroup>
+
+                  <!-- Allow modifications to user data (except pw) -->
+
+                  <ice:panelGrid rendered="#{usersBean.renderModifyUser()}"
+                                 columns="2">
+
+                     <ice:outputLabel value="User Id" for="cId"/>
+                     <ice:inputText id="cId" size="10" maxlength="10"
+                                    value="#{usersBean.chgUser.id}"/>
+
+                     <ice:outputLabel value="First Name" for="cFirstName"/>
+                     <ice:inputText id="cfirstName" size="32" maxlength="32"
+                                    value="#{usersBean.chgUser.firstName}"/>
+
+                     <ice:outputLabel value="Last Name" for="clastName"/>
+                     <ice:inputText id="cLastName" size="32" maxlength="32"
+                                    value="#{usersBean.chgUser.lastName}"/>
+
+                     <ice:outputLabel value="Email Address" for="cEmail"/>
+                     <ice:inputText id="cEmail" size="15" maxlength="32"
+                                    value="#{usersBean.chgUser.email}"/>
+
+                     <ice:outputLabel value="Administrator?" for="cAdmin"/>
+                     <ice:selectBooleanCheckbox id="cAdmin"
+                                                value="#{usersBean.chgUser.admin}"/>
+
+                     <ice:commandButton value="OK"
+                                        actionListener="#{usersBean.chgOk}"/>
+                     <ice:commandButton value="Cancel"
+                                        actionListener="#{usersBean.canChg}"/>
+
+                  </ice:panelGrid>
+
+                  <!-- Allow delete of user -->
+
+                  <ice:panelGrid rendered="#{usersBean.renderDeleteUser()}"
+                                 columns="2">
+
+                     <ice:outputText value="User Id"/>
+                     <ice:outputText value="#{usersBean.chgUser.id}"/>
+
+                     <ice:outputText value="First Name"/>
+                     <ice:outputText value="#{usersBean.chgUser.firstName}"/>
+
+                     <ice:outputText value="Last Name"/>
+                     <ice:outputText value="#{usersBean.chgUser.lastName}"/>
+
+                     <ice:outputText value="Email Address"/>
+                     <ice:outputText value="#{usersBean.chgUser.email}"/>
+
+                     <ice:outputText value="Administrator?" />
+                     <ice:outputText value="#{usersBean.chgUser.admin}"/>
+
+                     <ice:commandButton value="Delete this User"
+                                        actionListener="#{usersBean.delOk}"/>
+                     <ice:commandButton value="Cancel"
+                                        actionListener="#{usersBean.canChg}"/>
+                  </ice:panelGrid>
+
+                  <!-- Allow Reset of user pw -->
+
+                  <ice:panelGrid columns="2"
+                                 rendered="#{usersBean.renderResetUserPw()}">
+
+                     <ice:outputLabel value="New Password" for="nPw"/>
+                     <ice:inputSecret id="nPw" size="10" maxlength="10"
+                                      value="#{usersBean.newPw}"/>
+
+                     <ice:outputLabel value="Confirm Password" for="ncPw"/>
+                     <ice:inputSecret id="ncPw" size="10" maxlength="10"
+                                      value="#{usersBean.confirmPw}"/>
+
+                     <ice:commandButton value="Reset Password"
+                                        actionListener="#{usersBean.resetPw}"/>
+                     <ice:commandButton value="Cancel"
+                                        actionListener="#{usersBean.canChg}"/>
+                  </ice:panelGrid>
+               </ice:panelTab>
+            </ice:panelTabSet>
+         </ui:define>
+
+      </ui:composition>
+
+   </body>
+</html>
+

@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+   <h:head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <link href="./../resources/css/default.css" rel="stylesheet" type="text/css" />
+      <link href="./../resources/css/cssLayout.css" rel="stylesheet" type="text/css" />
+   </h:head>
+
+   <!--
+   Simple data table paginator
+   Use as a template with the ui:decorate tag.
+   Expects ui:param
+      - tableName Which is the id of the ice:dataTable to be paginated
+   -->
+
+   <h:body>
+      <center>
+         <ice:dataPaginator for="#{tableName}"
+                            fastStep="3"
+                            paginator="true"
+                            paginatorMaxPages="4"
+                            renderFacetsIfSinglePage="false">
+            <f:facet name="first">
+               <ice:graphicImage url="./resources/css/xp/css-images/arrow-first.gif"
+                                 style="border:none;"/>
+            </f:facet>
+            <f:facet name="last">
+               <ice:graphicImage url="./resources/css/xp/css-images/arrow-last.gif"
+                                 style="border:none;"/>
+            </f:facet>
+            <f:facet name="previous">
+               <ice:graphicImage url="./resources/css/xp/css-images/arrow-previous.gif"
+                                 style="border:none;"/>
+            </f:facet>
+            <f:facet name="next">
+               <ice:graphicImage url="./resources/css/xp/css-images/arrow-next.gif"
+                                 style="border:none;"/>
+            </f:facet>
+            <f:facet name="fastforward">
+               <ice:graphicImage url="./resources/css/xp/css-images/arrow-ff.gif"
+                                 style="border:none;"/>
+            </f:facet>
+            <f:facet name="fastrewind">
+               <ice:graphicImage url="./resources/css/xp/css-images/arrow-fr.gif"
+                                 style="border:none;"/>
+            </f:facet>
+
+         </ice:dataPaginator>
+      </center>
+   </h:body>
+
+</html>

@@ -1,0 +1,311 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      xmlns:f="http://java.sun.com/jsf/core">
+    
+    <body>
+        
+        <ui:composition template="./layout/lambdaTemplate.xhtml">
+            
+           <ui:define name="content">
+              
+              <ice:panelGroup>
+                 
+                 <ice:outputText
+                    rendered="#{alertsBean.numberOfStudies() == 0}"
+                    value="You are not assigned to receive alerts for any active studies"/>
+
+                 <ice:outputText
+                    rendered="#{alertsBean.totalNumberOfAlerts() == 0}"
+                    value="You have no alerts to process"/>
+
+                 <ice:panelGroup
+                    rendered="#{alertsBean.totalNumberOfAlerts() > 0}">
+
+                    <ice:outputText
+                       rendered="#{alertsBean.numberOfStudies() == 1}"
+                       value="#{alertsBean.studyUser.study.id} :
+                              #{alertsBean.studyUser.study.description}"/>
+
+                    <ice:panelGrid
+                       rendered="#{alertsBean.numberOfStudies() > 1}"
+                       columns="2">
+
+                       <ice:outputText
+                          value="Select study or 'All'"/>
+                       <ice:selectOneMenu
+                          value="#{alertsBean.selectedStudyId}"
+                          valueChangeListener="#{alertsBean.selectedStudyChange}">
+                          <f:selectItems
+                             value="#{alertsBean.studySelections}"/>
+                       </ice:selectOneMenu>
+
+                    </ice:panelGrid>
+
+                    <ice:dataTable
+                       id="alertTable"
+                       var="alrt"
+                       value="#{alertsBean.alerts}"
+                       sortColumn="#{alertsBean.sortColumnName}"
+                       sortAscending="#{alertsBean.ascending}">
+
+                       <f:facet name="header">
+                          <ice:columnGroup>
+                             <ice:headerRow>
+                                <ice:column colspan="#{alertsBean.totalColumns()}">
+                                   <ice:outputText value="Current alerts"/>
+                                </ice:column>
+                             </ice:headerRow>  
+                             <ice:headerRow>
+                                <ice:column colspan="#{alertsBean.requestColumns()}">
+                                   <ice:outputText value="Request"/>
+                                </ice:column>
+                                <ice:column colspan="#{alertsBean.alertColumns()}">
+                                   <ice:outputText value="Alert"/>
+                                </ice:column>
+                             </ice:headerRow>  
+                          </ice:columnGroup>
+                       </f:facet>
+
+                       <ice:column
+                          id="studyId"
+                          style="#{alertsBean.style('STUDY_ID')}"
+                          rendered="#{alertsBean.render('STUDY_ID')}">
+
+                          <f:facet name="header">
+                           <ice:commandSortHeader columnName="studyId">
+                              <ice:outputText value="Study Id"/>
+                           </ice:commandSortHeader>
+                        </f:facet>
+
+                          <ice:outputText value="#{alrt.request.study.id}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="reqMpi"
+                          style="#{alertsBean.style('REQUEST_MPI')}">
+
+                          <f:facet name="header">
+                           <ice:commandSortHeader columnName="requestMpi">
+                              <ice:outputText value="MPI"/>
+                           </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText value="#{alrt.request.mpi}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="reqName"
+                          style="#{alertsBean.style('REQUEST_NAME')}">
+
+                          <f:facet name="header">
+                           <ice:commandSortHeader columnName="requestName">
+                              <ice:outputText value="Name"/>
+                           </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText value="#{alrt.request.lastName}, "/>
+                          <ice:outputText value="#{alrt.request.firstName}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="reqDob"
+                          style="#{alertsBean.style('REQUEST_DOB')}">
+
+                          <f:facet name="header">
+                             <ice:commandSortHeader columnName="requestDob">
+                                <ice:outputText value="DOB"/>
+                             </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText value="#{alrt.request.dispDob}">
+                             <f:convertDateTime pattern="MM/dd/yyyy"/>
+                          </ice:outputText>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="reqSex"
+                          style="#{alertsBean.style('REQUEST_SEX')}">
+
+                          <f:facet name="header">
+                             <ice:commandSortHeader columnName="requestSex">
+                                <ice:outputText value="Sex"/>
+                             </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText value="#{alrt.request.sex}">
+                          </ice:outputText>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="reqAlertTypes"
+                          style="#{alertsBean.style('REQUEST_TYPES')}">
+
+                          <f:facet name="header">
+                                <ice:outputText value="Alert Types"/>
+                          </f:facet>
+
+                          <ice:outputText value="#{alrt.request.scheduledAlerts()}">
+                          </ice:outputText>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="reqDelete"
+                          style="#{alertsBean.style('REQUEST_DEL')}"
+                          rendered="#{alertsBean.render('REQUEST_DEL')}">
+
+                          <f:facet name="header">
+                             <ice:outputText value="Delete Request?"/>
+                          </f:facet>
+
+                          <ice:commandButton
+                             rendered="#{alrt.renderDeleteButton}"
+                             value="Delete"
+                             actionListener="#{alertsBean.deleteRequest(alrt)}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="aMpi"
+                          style="#{alertsBean.style('ALERT_MPI')}">
+
+                          <f:facet name="header">
+                           <ice:commandSortHeader columnName="mpi">
+                              <ice:outputText value="MPI"/>
+                           </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText
+                             styleClass="#{alrt.mpiClass()}"
+                             value="#{alrt.mpi}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="aName"
+                          style="#{alertsBean.style('ALERT_NAME')}">
+
+                          <f:facet name="header">
+                           <ice:commandSortHeader columnName="name">
+                              <ice:outputText value="Name"/>
+                           </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText
+                             styleClass="#{alrt.lastNameClass()}"
+                             value="#{alrt.lastName}, "/>
+                          <ice:outputText
+                             styleClass="#{alrt.firstNameClass()}"
+                             value="#{alrt.firstName}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="aDob"
+                          style="#{alertsBean.style('ALERT_DOB')}">
+
+                          <f:facet name="header">
+                             <ice:commandSortHeader columnName="dob">
+                                <ice:outputText value="DOB"/>
+                             </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText
+                             styleClass="#{alrt.dobClass()}"
+                             value="#{alrt.dispDob}">
+                             <f:convertDateTime pattern="MM/dd/yyyy"/>
+                          </ice:outputText>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="aSex"
+                          style="#{alertsBean.style('ALERT_SEX')}">
+
+                          <f:facet name="header">
+                             <ice:commandSortHeader columnName="sex">
+                                <ice:outputText value="Sex"/>
+                             </ice:commandSortHeader>
+                          </f:facet>
+
+                          <ice:outputText
+                             styleClass="#{alrt.sexClass()}"
+                             value="#{alrt.request.sex}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="event"
+                          style="#{alertsBean.style('ALERT_EVENT')}">
+
+                          <f:facet name="header">
+                                <ice:outputText value="Event"/>
+                          </f:facet>
+
+                          <ice:outputText
+                             value="#{alrt.eventName()}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="desc"
+                          style="#{alertsBean.style('ALERT_DESC')}">
+
+                          <f:facet name="header">
+                                <ice:outputText value="Description"/>
+                          </f:facet>
+
+                          <ice:outputText value="#{alrt.description}"/>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="arr"
+                          style="#{alertsBean.style('ALERT_DATE')}">
+
+                          <f:facet name="header">
+                                <ice:outputText value="Event Date"/>
+                          </f:facet>
+
+                          <ice:outputText
+                             value="#{alrt.dispArrivalTime}">
+                             <f:convertDateTime pattern="MM/dd/yyyy"/>
+                          </ice:outputText>
+
+                       </ice:column>
+
+                       <ice:column
+                          id="aDelete"
+                          style="#{alertsBean.style('ALERT_DEL')}"
+                          rendered="#{alertsBean.render('ALERT_DEL')}">
+
+                          <f:facet name="header">
+                             <ice:outputText value="Delete Alert?"/>
+                          </f:facet>
+
+                          <ice:commandButton
+                             rendered="#{alrt.renderDeleteButton}"
+                             value="Delete"
+                             actionListener="#{alertsBean.deleteAlert(alrt)}"/>
+
+                       </ice:column>
+
+
+                    </ice:dataTable>
+
+
+                 </ice:panelGroup>
+              </ice:panelGroup>
+            </ui:define>
+        </ui:composition>
+        
+    </body>
+</html>

@@ -1,0 +1,16 @@
+Excel report format
+
+0 = Title: Study Id
+   1 = SubTitle: Request Information
+      2 = Column Headers
+0         MPI
+1         Name Last, First
+2         DOB
+3        Sex
+   2 = SubTitle: Scheduled Exam Information
+4        MRI
+5        Name Last, First, Middle
+6        DOB
+7        Sex
+8        Hospital
+9       Exam Date/Time

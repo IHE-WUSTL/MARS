@@ -1,0 +1,5 @@
+# .gitignore for directories whose contents 
+# other than this .gitignore file are to be 
+# ignored. 
+*
+!.gitignore
